@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dashboard Ekonomi Global & Indonesia 2025</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      background: #f5f7fa;
+      color: #333;
+    }
+    header {
+      background: linear-gradient(90deg, #0077b6, #00b4d8);
+      color: white;
+      padding: 1.5rem;
+      text-align: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px;
+      padding: 20px;
+      background: #caf0f8;
+      border-bottom: 1px solid #ade8f4;
+    }
+    .controls select, .controls button {
+      padding: 10px;
+      border: none;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      background: white;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      cursor: pointer;
+    }
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      gap: 20px;
+      padding: 30px;
+    }
+    .card {
+      background: white;
+      border-radius: 15px;
+      padding: 20px;
+      box-shadow: 0 5px 12px rgba(0,0,0,0.1);
+      transition: transform 0.3s;
+    }
+    .card:hover {
+      transform: translateY(-5px);
+    }
+    footer {
+      text-align: center;
+      padding: 20px;
+      font-size: 0.8rem;
+      color: #777;
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>Dashboard Ekonomi Global & Indonesia 2025</h1>
+  <h3>Menghadapi Ketidakpastian Global dan Prospek Pertumbuhan Nasional</p>
+  <h4>Dibuat oleh: Danang Fatkhur Razak | 221031029</h2>
+</header>
+
+<div class="controls">
+  <select id="selectChart">
+    <option value="global">Pertumbuhan Ekonomi Global</option>
+    <option value="indonesia">Pertumbuhan Ekonomi Indonesia</option>
+    <option value="ekspor">Tren Ekspor Nonmigas</option>
+    <option value="safehaven">Pergerakan Safe Haven Assets</option>
+  </select>
+  <button onclick="downloadPDF()">Download PDF</button>
+</div>
+
+<div class="grid-container">
+  <div class="card">
+    <canvas id="mainChart"></canvas>
+  </div>
+
+  <div class="card">
+    <h3>Highlight Ekonomi</h3>
+    <ul>
+      <li>🔵 Perang tarif AS-Tiongkok picu fragmentasi global</li>
+      <li>🔵 Proyeksi pertumbuhan ekonomi dunia 2025: 2,9%</li>
+      <li>🔵 Indonesia: Konsumsi dan investasi nonbangunan tetap kuat</li>
+      <li>🔵 Safe haven assets meningkat: emas, aset Eropa & Jepang</li>
+      <li>🔵 Pertumbuhan Indonesia 2025 diperkirakan 4,7% - 5,5%</li>
+    </ul>
+  </div>
+</div>
+
+<footer>
+  Dashboard ini dikembangkan berdasarkan laporan Bank Indonesia dan Vibiznews 2025.
+</footer>
+
+<script>
+const chartData = {
+  global: {
+    labels: ["2024", "2025 (Forecast)"],
+    datasets: [{
+      label: 'Pertumbuhan Ekonomi Dunia (%)',
+      data: [3.2, 2.9],
+      backgroundColor: ['#00b4d8', '#0077b6']
+    }]
+  },
+  indonesia: {
+    labels: ["Bawah Kisaran", "Tengah Kisaran", "Atas Kisaran"],
+    datasets: [{
+      label: 'Proyeksi Pertumbuhan Ekonomi Indonesia (%)',
+      data: [4.7, 5.1, 5.5],
+      backgroundColor: ['#90e0ef', '#48cae4', '#00b4d8']
+    }]
+  },
+  ekspor: {
+    labels: ["Mesin", "Besi & Baja", "Lainnya"],
+    datasets: [{
+      label: 'Kontribusi Ekspor Nonmigas Q1 2025 (%)',
+      data: [40, 35, 25],
+      backgroundColor: ['#0077b6', '#0096c7', '#00b4d8']
+    }]
+  },
+  safehaven: {
+    labels: ["Emas", "Eurozone Assets", "Japan Bonds"],
+    datasets: [{
+      label: 'Aset Safe Haven Favorit 2025 (%)',
+      data: [45, 30, 25],
+      backgroundColor: ['#ffd166', '#118ab2', '#06d6a0']
+    }]
+  }
+};
+
+let currentChart;
+
+function renderChart(type) {
+  const ctx = document.getElementById('mainChart').getContext('2d');
+  if (currentChart) currentChart.destroy();
+  currentChart = new Chart(ctx, {
+    type: 'bar',
+    data: chartData[type],
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { position: 'bottom' },
+        title: {
+          display: true,
+          text: type === 'global' ? 'Pertumbuhan Ekonomi Dunia'
+              : type === 'indonesia' ? 'Proyeksi Ekonomi Indonesia'
+              : type === 'ekspor' ? 'Tren Ekspor Nonmigas'
+              : 'Safe Haven Assets 2025'
+        }
+      }
+    }
+  });
+}
+
+document.getElementById('selectChart').addEventListener('change', function() {
+  renderChart(this.value);
+});
+
+function downloadPDF() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  doc.text("Dashboard Ekonomi 2025", 20, 20);
+  doc.text("Berdasarkan laporan Bank Indonesia dan Vibiznews.", 20, 30);
+  doc.text("📌 Highlights:", 20, 50);
+  doc.text("- Fragmentasi ekonomi global meningkat", 30, 60);
+  doc.text("- Pertumbuhan dunia turun ke 2,9%", 30, 70);
+  doc.text("- Pertumbuhan Indonesia 4,7% - 5,5%", 30, 80);
+  doc.save('dashboard_ekonomi_2025.pdf');
+}
+
+// Initial chart load
+renderChart('global');
+</script>
+
+</body>
+</html>
